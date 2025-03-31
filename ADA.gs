@@ -1,7 +1,7 @@
 //Config
 var mode = ["test", "all"]; //first field: "test" or "real", second field: "all" or "pb"
-const termAndWeek = "test";
-const houseOnDuty = "CKS";
+const termAndWeek = "T0W0";
+const houseOnDuty = "SLT";
 const copyRosterTemplate = true;
 
 const schoolPrefectColor = "#000000"; //color of school prefect names on roster
@@ -9,13 +9,13 @@ const housePrefectColor = "#ff0000"; //color of house prefect/nominee names on r
 const subcommProbabilityScalingFactor = 0.68; //how many exco/emcee duties subcomm excos get compared to regular excos
 
 //Sheets & docs IDs
-const testPBAttendanceSheetID = "1tAwar9c54ewFZ983QysBz-7gx_BVK3j-ZHVnoqScOUU";
-const realPBAttendanceSheetID = "1HOCK7yRFyu9wNEprNTqaxSvrjV-ZRjCHJ3aIL3WXI-Q";
-const testHouseAttendanceSheetID = "1rI7aVnylMhPJ2NHf4VLna1estEBL7kr2H0SuWmsBAL4";
-const realHouseAttendanceSheetID = "1Uj6yKl-6XH9NhdY0N5CcotdnhmL-ZyVIbPZzzBC9KLI";
-const testDatabaseSheetID = "1wrsHF6yHXpAaGkqNyIq59qozCQUwkl8YjiZzkfcb_NI";
-const realDatabaseSheetID = "1s065nNNeU5dvTyHPCS2QMOXGs-ordtpHwGGCNXTgzR4";
-const rosterTemplateID = "1CexwFOsPh0H1CiFfIOO0GXRP7jNsJMD1fQFkSyrgeyQ";
+const testPBAttendanceSheetID = "";
+const realPBAttendanceSheetID = "";
+const testHouseAttendanceSheetID = "";
+const realHouseAttendanceSheetID = "";
+const testDatabaseSheetID = "";
+const realDatabaseSheetID = "";
+const rosterTemplateID = "";
 
 //Database format (1-indexed) (col 1 = col A)
 const fullNameCol = 1;

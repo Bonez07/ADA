@@ -1,5 +1,5 @@
 # Automatic Duty Allocation (ADA)
-## Automatic Duty Allocation for ACS (International) Prefectorial Boards 
+## Automatic Duty Allocation for ACS (International) Prefects
 
 (Intro paragraph)
 (Features)

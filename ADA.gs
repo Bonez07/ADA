@@ -1,22 +1,28 @@
 //Config
 var mode = ["test", "all"]; //first field: "test" or "real", second field: "all" or "pb"
-const termAndWeek = "T0W0";
+const termAndWeek = "test11";
 const houseOnDuty = "SLT";
 const copyRosterTemplate = true;
 
 const schoolPrefectColor = "#000000"; //color of school prefect names on roster
 const housePrefectColor = "#ff0000"; //color of house prefect/nominee names on roster
-const subcommProbabilityScalingFactor = 0.68; //how many exco/emcee duties subcomm excos get compared to regular excos
+const subcommProbabilityScalingFactor = 0.55; //how many exco/emcee duties subcomm excos get compared to regular excos
 
 //Sheets & docs IDs
-const testPBAttendanceSheetID = "";
-const realPBAttendanceSheetID = "";
-const testHouseAttendanceSheetID = "";
-const realHouseAttendanceSheetID = "";
-const testDatabaseSheetID = "";
-const realDatabaseSheetID = "";
-const rosterTemplateID = "";
+const testPBAttendanceSheetID = "1tAwar9c54ewFZ983QysBz-7gx_BVK3j-ZHVnoqScOUU";
+const realPBAttendanceSheetID = "1HOCK7yRFyu9wNEprNTqaxSvrjV-ZRjCHJ3aIL3WXI-Q";
+const testHouseAttendanceSheetID = "1rI7aVnylMhPJ2NHf4VLna1estEBL7kr2H0SuWmsBAL4";
+const realHouseAttendanceSheetID = "1Uj6yKl-6XH9NhdY0N5CcotdnhmL-ZyVIbPZzzBC9KLI";
+const testDatabaseSheetID = "1wrsHF6yHXpAaGkqNyIq59qozCQUwkl8YjiZzkfcb_NI";
+const realDatabaseSheetID = "1s065nNNeU5dvTyHPCS2QMOXGs-ordtpHwGGCNXTgzR4";
+const rosterTemplateID = "18LnPvOMw4MxYfpe58ljXmZhDuN5hvmwWHMRyWVXEsu8";
 
+//Allocation weightings
+const timeSinceSpecificDutyWeighting = 0.6; //proportion
+const generalScoreWeighting = 0.8; //proportion
+const worseScoreWeighting = 0.4;
+const dutiesThisWeekWeightingPB = 2.5; //relative to total duties
+const dutiesThisWeekWeightingHouse = 3.1;
 //Database format (1-indexed) (col 1 = col A)
 const fullNameCol = 1;
 const nameCol = 2;
@@ -41,6 +47,7 @@ function main() {
   }
   console.log("Processing duties");
   let duties = getDutiesList(rosterDoc);
+  duties = processDuties(duties);
   duties = linkDuties(duties, prefectorialBoard, housePrefects);
   numberOfDuties = duties.length; 
   //Sort duties into forced, exco, PB, and HP
@@ -86,45 +93,13 @@ function main() {
     let minimum = Math.min(...noElligible);
     if (minimum == 0) {
       //if no good elligible find regular elligible
-      console.warn("No good elligible: ", excoDuties[noElligible.indexOf(minimum)].raw);
       noElligible = excoDuties.map(duty => prefectorialBoard.findElligible(duty).length);
       minimum = Math.min(...noElligible);
     }
     //find index
     let index = noElligible.indexOf(minimum);
-    //give error if none elligible at all
-    if (minimum == 0) {
-      console.log("Error: none elligible: ", excoDuties[index])
-      excoDuties.splice(index, 1);
-      continue;
-    }
-    let duty = excoDuties[index];
-    excoDuties.splice(index, 1);
-    if (duty.id == "EX") {
-      if (duty.requirements[3] == "ES") {
-        const subcommProbability = subcommProbabilityScalingFactor*(3/8)*(prefectorialBoard.prefects.filter(prefect => prefect.data[3] == "S" && !(prefect.unavailableDays.includes(duty.day))).length)/(8+prefectorialBoard.prefects.filter(prefect => prefect.data[3] == "S").length);
-        console.log("Subcomm probability: ", subcommProbability);
-        duty.requirements[3] = Math.random() < subcommProbability ? "S" : "E";
-        prefectorialBoard.allocateDuty(duty);
-      }
-      else {
-        prefectorialBoard.allocateDuty(duty);
-      }
-      continue;
-    }
-    //special case for emcee duties
-    else if (duty.id == "MC") {
-      if (duty.requirements[3] == "ES") {
-        const subcommProbability = subcommProbabilityScalingFactor*(prefectorialBoard.prefects.filter(prefect => prefect.data[3] == "S" && !(prefect.unavailableDays.includes(duty.day))).length)/(6+prefectorialBoard.prefects.filter(prefect => prefect.data[3] == "S").length);
-        console.log("Subcomm probability: ", subcommProbability);
-        duty.requirements[3] = Math.random() < subcommProbability ? "S" : "E";
-        prefectorialBoard.allocateDuty(duty);
-      }
-      else {
-        prefectorialBoard.allocateDuty(duty);
-      }
-      continue;
-    }
+    prefectorialBoard.allocateDuty(excoDuties[index])
+    excoDuties.splice(index, 1)
   }
   //Allocate PB duties
   while (pbDuties.length > 0) {
@@ -133,18 +108,11 @@ function main() {
     let minimum = Math.min(...noElligible);
     if (minimum == 0) {
       //if no good elligible find regular elligible
-      console.warn("No good elligible: ", pbDuties[noElligible.indexOf(minimum)].raw);
       noElligible = pbDuties.map(duty => prefectorialBoard.findElligible(duty).length);
       minimum = Math.min(...noElligible);
     }
     //find index
     let index = noElligible.indexOf(minimum);
-    //give error if none elligible at all
-    if (minimum == 0) {
-      console.log("Error: none elligible: ", pbDuties[index])
-      pbDuties.splice(index, 1);
-      continue;
-    }
     prefectorialBoard.allocateDuty(pbDuties[index])
     pbDuties.splice(index, 1)
   }
@@ -204,6 +172,15 @@ function initialize() {
   }
   //Create prefect classes 
   prefectorialBoard = new Prefects("PB", "#ffffff", pbAttendanceSheet, databaseSheet, rosterDoc);
+  //Replace house captains data for SLT weeks
+  if (houseOnDuty == "SLT") {
+    mode[1] = "pb";
+    for (let i = 0; i < prefectorialBoard.prefects.length; i++) {
+      if (prefectorialBoard.prefects[i].data[3] == "H") {
+        prefectorialBoard.prefects[i].data = prefectorialBoard.prefects[i].data.substring(0, 3) + "N";
+      }
+    }
+  }
   if (mode[1].toLowerCase().trim() == "all") {
     switch (houseOnDuty.toUpperCase().trim()) {
       case "PROBATION NOMINEES":
@@ -235,15 +212,6 @@ function initialize() {
         break;
       default:
         throw new Error(`Invalid house: ${houseOnDuty}`);
-    }
-  }
-  //Replace house captains data for SLT weeks
-  if (houseOnDuty == "SLT") {
-    mode[1] = "pb";
-    for (let i = 0; i < prefectorialBoard.prefects.length; i++) {
-      if (prefectorialBoard.prefects[i].data[3] == "H") {
-        prefectorialBoard.prefects[i].data = prefectorialBoard.prefects[i].data.substring(0, 3) + "N";
-      }
     }
   }
   //Init roster doc
@@ -391,7 +359,7 @@ function linkDuties(rawDuties, pb, hp) {
         //Loop through the matches, modify them and check number of elligible
         let noElligible = [];
         for (const match of matches) {
-            linkedDuties[match].requirements[requirementIndex] = linkedDuties[match].requirements[requirementIndex].match(/\[([^-\]]+)(?:-[^\]]*)?\]/)[1];
+          linkedDuties[match].requirements[requirementIndex] = linkedDuties[match].requirements[requirementIndex].match(/\[([^-\]]+)(?:-[^\]]*)?\]/)[1];
           if (linkedDuties[match].prefects == "PB") {
             noElligible.push(pb.findGoodElligible(linkedDuties[match]).length);
           }
@@ -400,10 +368,12 @@ function linkDuties(rawDuties, pb, hp) {
           }
         }
         let possible = []; //list of indices in matches list where there are more than 2 elligible
+        let sumOfNoEliigible = 0;
         if (Math.max(...noElligible) > 2) {
           for (let i = 0; i < matches.length; i++) {
             if (noElligible[i] > 2) {
               possible.push(i);
+              sumOfNoEliigible += noElligible[i];
             }
           }
         }
@@ -411,11 +381,15 @@ function linkDuties(rawDuties, pb, hp) {
           for (let i = 0; i < matches.length; i++) {
             if (noElligible[i] == Math.max(...noElligible)) {
               possible.push(i);
+              sumOfNoEliigible += noElligible[i];
             }
           }
         }
         //radomly pick from possible, find corresponding match
-        let chosenIndex = possible[Math.floor(Math.random() * possible.length)]; //matches index that is chosen
+        const randomPick = (arr, probs, r = Math.random()) => arr[probs.findIndex(p => (r -= p) < 0)];
+        const probabilities = possible.map(possible => (noElligible[possible]/sumOfNoEliigible));
+        let chosenIndex = randomPick(possible, probabilities); //matches index that is chosen
+        console.log(linkedDuties[matches[chosenIndex]], possible.map(possible => linkedDuties[matches[possible]]), probabilities);
         //replace requirement for all the other matches as * (all of them were replaced earlier)
         for (let i = 0; i < matches.length; i++) {
           if (i != chosenIndex) {
@@ -426,6 +400,49 @@ function linkDuties(rawDuties, pb, hp) {
     }
   }
   return [...notLinkedDuties, ...linkedDuties];
+}
+function processDuties(rawDuties, pb) {
+  //Shuffle duties
+  duties = [...rawDuties]
+  for (let i = duties.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [duties[i], duties[j]] = [duties[j], duties[i]];
+  }
+  duties.forEach(duty => {
+    if (duty.prefects == "PB") {
+      if (duty.id == "EX") {
+        if (duty.requirements[3] == "ES") {
+          const noSubcomms = prefectorialBoard.prefects.filter(prefect => prefect.data[3] == "S" && !(prefect.unavailableDays.includes(duty.day))).length;
+          const noExcos = prefectorialBoard.prefects.filter(prefect => prefect.data[3] == "E" && !(prefect.unavailableDays.includes(duty.day))).length;
+          const subcommProbability = Math.min((2*subcommProbabilityScalingFactor*noSubcomms)/(noExcos + subcommProbabilityScalingFactor*noSubcomms), 0.9);
+          console.log("subcomm probability: ", subcommProbability);
+          duty.requirements[3] = Math.random() < subcommProbability ? "S" : "E";
+        }
+      }
+      //special case for emcee duties
+      else if (duty.id == "MC") {
+        if (duty.requirements[3] == "ES") {
+          const noSubcomms = prefectorialBoard.prefects.filter(prefect => prefect.data[3] == "S" && !(prefect.unavailableDays.includes(duty.day))).length;
+          const noExcos = prefectorialBoard.prefects.filter(prefect => prefect.data[3] == "E" && !(prefect.unavailableDays.includes(duty.day))).length;
+          const subcommProbability = (subcommProbabilityScalingFactor*noSubcomms)/(noExcos+noSubcomms);
+          console.log("subcomm probability: ", subcommProbability);
+          duty.requirements[3] = Math.random() < subcommProbability ? "S" : "E";
+        }
+      }
+    }
+  });
+  return duties;
+}
+function standardize(value, list) {
+  if (!Array.isArray(list) || list.length === 0) {
+    return 0;
+  }
+  let mean = list.reduce((sum, num) => sum + num, 0) / list.length;
+  let stddev = Math.sqrt(list.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / list.length);
+  if (stddev === 0) {
+    return 0;
+  }
+  return (value - mean) / stddev;
 }
 class Prefects {
   constructor(name, color, attendanceSheet, databaseSheet, rosterDoc) {
@@ -457,15 +474,14 @@ class Prefects {
       }
     }
     if (prefect == undefined) {
-      console.error(`Prefect "${duty.requirements[0]}" not found for forced duty "${duty}"`);
+      console.error(`Prefect "${duty.requirements[0]}" not found for forced duty "${duty.raw}"`);
     }
     this.incrementDuties(prefect, duty);
     return prefect
   }
   allocateDuty(duty) {
     dutyCount++;
-    let exco = (duty.requirements[3].includes("E") && this.name == "PB") ? true : false;
-    console.log("Allocating: ", duty.raw);
+    console.log("Allocating: ", duty.raw, this.findGoodElligible(duty).length);
     let elligible = this.findElligible(duty);
     //TODO: count statistics on how many ppl go in each filter
     let initialElligible = elligible;
@@ -477,41 +493,115 @@ class Prefects {
     elligible = elligible.filter(prefect => !(prefect.adjacentDutyDays.includes(duty.day)));
     if (elligible.length == 0) {
       elligible = initialElligible;
-      console.warn(`No good matches for "${duty.raw}"`)
+      console.warn(`No good matches for "${duty.raw}"`);
     }
     else {
       initialElligible = elligible;
     }
-    //check previous duty
-    elligible = elligible.filter(prefect => !(prefect.pastDuties.substring(prefect.pastDuties.length - 3).includes(duty.id)));
-    if (elligible.length == 0) {
-      elligible = initialElligible;
-      console.warn(`No good matches for "${duty.raw}"`)
+    if (duty.id != "EX") {
+      //check previous duty
+      elligible = elligible.filter(prefect => !(prefect.pastDuties.substring(prefect.pastDuties.length - 3).includes(duty.id)));
+      if (elligible.length == 0) {
+        elligible = initialElligible;
+        console.warn(`No good matches for "${duty.raw}"`);
+      }
+      else {
+        initialElligible = elligible;
+      }
+      //prevent giving 3 duties in 1 week
+      elligible = elligible.filter(prefect => prefect.dutiesThisWeek < 2);
+      if (elligible.length == 0) {
+        elligible = initialElligible;
+        console.warn(`No good matches for "${duty.raw}"`);
+      }
     }
-    //3 least duties
-    const threeLeastTotal = [...new Set(elligible.map(person => person.totalDuties))].sort((a, b) => a - b).slice(0, 3);
-    elligible = elligible.filter(prefect => threeLeastTotal.includes(prefect.totalDuties));
-    //2 least duties that week
-    const twoLeastThisWeek = [...new Set(elligible.map(person => person.dutiesThisWeek))].sort((a, b) => a - b).slice(0, 2);
+    //scoring remaining prefects
+    elligible.forEach(prefect => {
+      if (prefect.data[3] == "S" && duty.id != "EX") {
+        prefect.timeSinceSpecificDuty = Math.ceil((prefect.pastDuties.split('').reverse().join('').indexOf(" " + duty.id.split('').reverse().join(''))+prefect.pastDuties.replaceAll("EX ", "").split('').reverse().join('').indexOf(" " + duty.id.split('').reverse().join('')))/6);
+        prefect.totalSpecificDuties = Math.floor((prefect.pastDuties.split(duty.id).length - 1)*(prefect.pastDuties.split(" ").length - 1)/(prefect.pastDuties.replaceAll("EX ", "").split(" ").length - 1));
+      }
+      else {
+        prefect.timeSinceSpecificDuty = prefect.pastDuties.split('').reverse().join('').indexOf(" " + duty.id.split('').reverse().join(''))/3;
+        prefect.totalSpecificDuties = prefect.pastDuties.split(duty.id).length - 1;
+      }
+    });
+    //create total list variables for normalization
+    let totalDuties = elligible.map(prefect => prefect.totalDuties);
+    let timesSinceSpecificDuty = elligible.map(prefect => prefect.timeSinceSpecificDuty);
+    let totalSpecificDuties = elligible.map(prefect => prefect.totalSpecificDuties);
+    //standardize and score
+    elligible.forEach(prefect => {
+      if (prefect.timeSinceSpecificDuty < 0 || prefect.timeSinceSpecificDuty === NaN) {
+        prefect.timeSinceSpecificDuty = Math.max(...timesSinceSpecificDuty) + 1;
+      }
+      if (this.name == "PB" || this.name == "Probation Nominees") {
+        prefect.generalScore = (prefect.totalDuties - Math.min(...totalDuties)) + (dutiesThisWeekWeightingPB * prefect.dutiesThisWeek);
+        prefect.specificScore = timeSinceSpecificDutyWeighting*(-standardize(prefect.timeSinceSpecificDuty, timesSinceSpecificDuty)) + (1-timeSinceSpecificDutyWeighting)*(standardize(prefect.totalSpecificDuties, totalSpecificDuties));
+      }
+      else {
+        prefect.generalScore = (prefect.totalDuties - Math.min(...totalDuties)) + (dutiesThisWeekWeightingHouse * prefect.dutiesThisWeek);
+        prefect.specificScore = timeSinceSpecificDutyWeighting*(-standardize(prefect.timeSinceSpecificDuty, timesSinceSpecificDuty)) + (1-timeSinceSpecificDutyWeighting)*(standardize(prefect.totalSpecificDuties, totalSpecificDuties));
+      }
+    });
+    let generalScores = elligible.map(prefect => prefect.generalScore);
+    elligible.forEach(prefect => {
+      prefect.generalScore = standardize(prefect.generalScore, generalScores);
+      //total score is average of average of scores and maximum of scores (average scewed towards higher value)
+      if (duty.id == "EX") {
+        //for exco specific score is only used as a discriminator when tied
+        prefect.totalScore = (95/100)*prefect.generalScore + (5/100)*prefect.specificScore;
+      }
+      else {
+        prefect.totalScore = (worseScoreWeighting)*Math.max(prefect.generalScore, prefect.specificScore) + (1-worseScoreWeighting)*((generalScoreWeighting)*prefect.generalScore + (1-generalScoreWeighting)*prefect.specificScore);
+      }   
+    });
+    let prefect = elligible.filter(prefect => Math.min(...elligible.map(person => person.totalScore)) == prefect.totalScore);
+    prefect = prefect[0];
+    if (elligible.filter(prefect => prefect.totalScore - Math.min(...elligible.map(person => person.totalScore)) < 0.1).length > 1) {
+      console.log(elligible.filter(prefect => prefect.totalScore - Math.min(...elligible.map(person => person.totalScore)) < 0.1));
+      console.log(prefect);
+    }
+    //console.log(prefect);
+    /*//3 least total duties (ignore for house)
+    if (this.name == "PB" || this.name == "Probation Nominees") {
+      const threeLeastTotal = [...new Set(elligible.map(prefect => prefect.totalDuties))].sort((a, b) => a - b).slice(0, 3); //this went wrong
+      elligible = elligible.filter(prefect => threeLeastTotal.includes(prefect.totalDuties));
+    }
+    //2 least duties this week
+    const twoLeastThisWeek = [...new Set(elligible.map(prefect => prefect.dutiesThisWeek))].sort((a, b) => a - b).slice(0, 2);
     elligible = elligible.filter(prefect => twoLeastThisWeek.includes(prefect.dutiesThisWeek));
     //2 least specific duties
-    if (!exco) {
-      const twoLeastSpecific = [...new Set(elligible.map(person => person.pastDuties.split(duty.id).length - 1))].sort((a, b) => a - b).slice(0, 2);
-      elligible = elligible.filter(prefect => twoLeastSpecific.includes(prefect.pastDuties.split(duty.id).length - 1));
+    const twoLeastSpecific = [...new Set(elligible.map(prefect => this.totalDutiesProportion(prefect, duty)))].sort((a, b) => a - b).slice(0, 2);
+    elligible = elligible.filter(prefect => twoLeastSpecific.includes(this.totalDutiesProportion(prefect, duty)));
+    //2 least total duties (ignore for house)
+    if (this.name == "PB" || this.name == "Probation Nominees") {
+      const twoLeastTotal = [...new Set(elligible.map(prefect => prefect.totalDuties))].sort((a, b) => a - b).slice(0, 2);
+      elligible = elligible.filter(prefect => twoLeastTotal.includes(prefect.totalDuties));
     }
-    //2 least total duties
-    const twoLeastTotal = [...new Set(elligible.map(person => person.totalDuties))].sort((a, b) => a - b).slice(0, 2);
-    elligible = elligible.filter(prefect => twoLeastTotal.includes(prefect.totalDuties));
     //least duties this week
     elligible = elligible.filter(prefect => Math.min(...elligible.map(person => person.dutiesThisWeek)) == prefect.dutiesThisWeek);
-    //least total duties
-    elligible = elligible.filter(prefect => Math.min(...elligible.map(person => person.totalDuties)) == prefect.totalDuties);
+    //least total duties (ignore for house)
+    if (this.name == "PB" || this.name == "Probation Nominees") {
+      elligible = elligible.filter(prefect => Math.min(...elligible.map(person => person.totalDuties)) == prefect.totalDuties);
+    }
     //least specific duties
-    if (!exco) {
-      elligible = elligible.filter(prefect => Math.min(...elligible.map(person => person.pastDuties.split(duty.id).length - 1)) == prefect.pastDuties.split(duty.id).length - 1);
+    elligible = elligible.filter(prefect => Math.min(...elligible.map(person => this.totalDutiesProportion(person, duty))) == this.totalDutiesProportion(prefect, duty));
+    //least total for house only
+    if (!(this.name == "PB" || this.name == "Probation Nominees")) {
+      elligible = elligible.filter(prefect => Math.min(...elligible.map(person => person.totalDuties)) == prefect.totalDuties);
+    }
+    if (elligible.length > 1) {
+      let neverDoneDuty = elligible.filter(prefect => !prefect.pastDuties.includes(duty.id));
+      if (neverDoneDuty.length == 0) {
+        elligible = elligible.filter(prefect => Math.min(...elligible.map(person => person.pastDuties.split('').reverse().join('').indexOf(duty.id.split('').reverse().join('')))) == prefect.pastDuties.split('').reverse().join('').indexOf(duty.id.split('').reverse().join('')));
+      }
+      else {
+        elligible = neverDoneDuty;
+      }
     }
     //randomly select from the rest
-    const prefect = elligible[Math.floor(Math.random() * elligible.length)];
+    const prefect = elligible[Math.floor(Math.random() * elligible.length)];*/
     //increment duties
     this.incrementDuties(prefect, duty);
     return prefect;
@@ -630,7 +720,7 @@ class Prefects {
     }
     let finalTotalDuties = this.attendanceWorksheet.getRange(1, 8, this.databaseWorksheet.getLastRow(), 1).getValues();
     for (let prefectIndex = 0; prefectIndex < this.prefects.length; prefectIndex++) {
-      this.prefects[prefectIndex].totalDuties = finalTotalDuties[this.prefects[prefectIndex].number - 1];
+      this.prefects[prefectIndex].totalDuties = finalTotalDuties[this.prefects[prefectIndex].number - 1][0];
     }
     this.checkboxes = this.attendanceWorksheet.getRange(firstPrefectRow, 2, this.prefectsAttendanceLength, 5).getDataValidations();
   }
@@ -654,11 +744,11 @@ class Prefects {
           return false;
         }
       }
-      if (!(duty.requirements[3].includes("E") && duty.prefects == "PB")) {
-        return !(prefect.unavailableDays.includes(duty.day) || prefect.adjacentDutyDays.includes(duty.day) || (prefect.pastDuties.substring(prefect.pastDuties.length - 3).includes(duty.id)));
+      if (duty.id != "EX") {
+        return !(prefect.unavailableDays.includes(duty.day) || prefect.adjacentDutyDays.includes(duty.day) || (prefect.pastDuties.substring(prefect.pastDuties.length - 3).includes(duty.id)) || prefect.dutiesThisWeek > 1);
       }
       else {
-        return !(prefect.unavailableDays.includes(duty.day) || prefect.adjacentDutyDays.includes(duty.day));
+        return !(prefect.unavailableDays.includes(duty.day) || prefect.adjacentDutyDays.includes(duty.day) || prefect.dutiesThisWeek > 1);
       }});
   }
   placeCheckboxes() {

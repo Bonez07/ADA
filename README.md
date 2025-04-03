@@ -3,27 +3,28 @@
 <p align="center">Automatic duty allocation and attendance sheet generation for school and house prefects at ACS International. Created and maintained by Bono Jakub Gajdek, Secretary/SHOH of the 20th Prefectorial Board.</p>
 
 # Features
-- High quality duty allocations taking into account various factors including:
+- Automatic duty allocations taking into account:
   - Total number of duties
   - Number of duties that week
   - Time since the prefect has last done a specific duty
   - The amount of times a prefect has done a specific duty
 - Automatic creation and updating of duty attendance sheets
-- Flexible changing of duties and their requirements as necessary on a Google Doc
+- Flexible customisation of duties and their requirements based on the house and other circumstances
 
 # Video guide
 
-# Set-up instructions
-### Setting up the code
+# Setting up
+## Setting up the code
 1. Create a new folder for ADA under duties in the Prefectorial Board drive
 2. Create a new apps script project (you may call it "ADA")
 <img width="400" alt="Screenshot 2025-04-03 at 13 43 53" src="https://github.com/user-attachments/assets/12bac2b6-c948-42d9-afd1-1cc663363756" />
 
 3. Copy the code from [ADA.gs](https://github.com/Bonez07/ADA/blob/main/ADA.gs) and paste it into your apps script project
 
-### Setting up the allocation database
-ADA requires all the data of the prefects to be stored in a spreadsheet referred to as the duty allocation database that looks like this:\
-<img width="800" alt="Screenshot 2025-04-03 at 22 27 35" src="https://github.com/user-attachments/assets/68ef5785-7071-4332-91d5-68d355b9f6e0" />\
+## Setting up the allocation database
+ADA requires all the data of the prefects to be stored in a spreadsheet referred to as the duty allocation database which looks like this:\
+<img width="800" alt="Screenshot 2025-04-03 at 22 41 52" src="https://github.com/user-attachments/assets/1ce6acca-b870-443d-b247-7a32665a03f9" />
+
 **1.** Collect the following information about each of the Prefectorial Board members and house prefects who will be doing duty (preferably through a Google Form):
   - Full name
   - Preferred name (the name that will be put on the duty roster)
@@ -48,14 +49,17 @@ For example:\
 > [!TIP]
 > Use find and replace and the `=CONCATENATE()` function in Google Sheets to easily combine the raw responses to the 4 letter code format
 
+> [!NOTE]
+> The specific letters used for the 4 letter codes may be changed and new letters may be used when necessary, as long as the template Google Doc is updated (discussed later on)
+
 **3.** Transfer all the data to a new Google Sheet (you may call it "Duty Allocation Database") with the formatting seen [above](#setting-up-the-allocation-database)
 
+## Setting up attendance sheets
 
-### Setting up attendance sheets
 
-### Setting up roster templates
+## Setting up roster templates
 
-### Linking the sheets and documents to the code
+## Linking the sheets and documents to the code
 
 # Usage instructions
 

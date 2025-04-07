@@ -54,10 +54,44 @@ For example:\
 
 **3.** Transfer all the data to a new Google Sheet (you may call it "Duty Allocation Database") with the formatting seen [above](#setting-up-the-allocation-database)
 
-## Setting up attendance sheets
+**4.** Create a new worksheet in the database spreadsheet for every house and fill it in in the same manner. **The worksheet titles must use these precise names**:
 
+<img width="667" alt="Screenshot 2025-04-07 at 22 18 13" src="https://github.com/user-attachments/assets/240c06b9-49df-4682-842e-5d353557ec95" />
+
+
+## Setting up attendance sheets
+2 attendace spreadsheets will be needed for ADA - one for school prefects and one for house prefects (or probation nominees). The attendance sheets will be generated when generating rosters from a template that needs to be set up.
+
+**1.** On the PB attendance Google Sheet, make a worksheet named "Template"
+
+**2.** Fill in the template worksheet with the following format (probation nominees sheet would also follow this format)
+
+<img width="800" alt="Screenshot 2025-04-07 at 08 38 42" src="https://github.com/user-attachments/assets/108ec224-bb1a-46cb-af45-0bddcb32216b" />
+
+> [!IMPORTANT]
+> Names on the template must be in the same rows and same order as in the database. Columns up to H (T. Duties all time) must be in the same format as in the image provided.
+
+**3.** On the House Prefects attendance Google Sheet, make a worksheet named "Template"
+
+**4.** Since the House Prefects change every week, the template should not include any names - they will be filled in by the program using the database:
+
+<img width="800" alt="Screenshot 2025-04-07 at 09 03 55" src="https://github.com/user-attachments/assets/17e596fa-e04d-418b-9488-3651d5663a19" />
 
 ## Setting up roster templates
+For ADA to know what duties to allocate, duties need to but put down on the roster template using a code in curly brackets for every duty:
+
+<img width="500" alt="Screenshot 2025-04-07 at 23 13 26" src="https://github.com/user-attachments/assets/36bd72b9-1325-4fbd-a79c-49dee38591b2" />
+
+Duty codes are split into 3 parts separated by underscores:
+
+<img width="560" alt="Screenshot 2025-04-08 at 00 15 49" src="https://github.com/user-attachments/assets/711c709f-4e94-48f8-b792-9406e4128fd5" />
+
+
+
+
+
+
+
 
 ## Linking the sheets and documents to the code
 

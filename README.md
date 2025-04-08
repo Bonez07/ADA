@@ -2,14 +2,30 @@
 
 <p align="center">Automatic duty allocation and attendance sheet generation for school and house prefects at ACS International. Created and maintained by Bono Jakub Gajdek, Secretary/SHOH of the 20th Prefectorial Board.</p>
 
-# Features
-- Automatic duty allocations taking into account:
-  - Total number of duties
-  - Number of duties that week
-  - Time since the prefect has last done a specific duty
-  - The amount of times a prefect has done a specific duty
-- Automatic creation and updating of duty attendance sheets
-- Flexible customisation of duties and their requirements based on the house and other circumstances
+# Overview
+
+<img width="600" alt="ADA overview" src="https://github.com/user-attachments/assets/bfe90b1a-9d8a-4c5d-99dd-98df3c848e48" />
+
+**ADA works with 4 primary files when allocating duties:**
+- Duty roster template doc
+  - Document which contains all of the duties ADA needs to allocate (these are written in a special code explained later)
+  - These duties can be flexibly changed as necessary
+  - ADA copies this document to create the duty roster and replaces the duty codes with names it allocated
+- 2 attendance sheets for PB and House
+  - ADA extracts the total duty counts from these spreadsheets to be used in allocation
+  - ADA creates a new attendance sheet under these spreadsheets from a template
+  - It fills the newly created attendance sheet with checkboxes based on allocations and updates the total duty count
+- Duty allocation database sheet
+  -  Sheet containing names, data (if they are Singaporean, Christian, gender and position), past duties, days where prefect is unavailable
+  -  This data is used in allocations of duties
+  -  ADA updates the past duties column after allocating
+ 
+Duty allocations take into account:
+- Requirements of the duty
+- Total number of duties
+- Number of duties that week
+- Time since the prefect has last done a specific duty
+- The amount of times a prefect has done a specific duty
 
 # Video guide
 
@@ -17,13 +33,13 @@
 ## Setting up the code
 1. Create a new folder for ADA under duties in the Prefectorial Board drive
 2. Create a new apps script project (you may call it "ADA")
-<img width="400" alt="Screenshot 2025-04-03 at 13 43 53" src="https://github.com/user-attachments/assets/12bac2b6-c948-42d9-afd1-1cc663363756" />
+<img width="400" alt="Creating apps script project" src="https://github.com/user-attachments/assets/12bac2b6-c948-42d9-afd1-1cc663363756" />
 
 3. Copy the code from [ADA.gs](https://github.com/Bonez07/ADA/blob/main/ADA.gs) and paste it into your apps script project
 
 ## Setting up the allocation database
 ADA requires all the data of the prefects to be stored in a spreadsheet referred to as the duty allocation database which looks like this:\
-<img width="800" alt="Screenshot 2025-04-03 at 22 41 52" src="https://github.com/user-attachments/assets/1ce6acca-b870-443d-b247-7a32665a03f9" />
+<img width="800" alt="Duty Allocation Database" src="https://github.com/user-attachments/assets/1ce6acca-b870-443d-b247-7a32665a03f9" />
 
 **1.** Collect the following information about each of the Prefectorial Board members and house prefects who will be doing duty (preferably through a Google Form):
   - Full name
@@ -87,21 +103,27 @@ Duty codes are split into 3 parts separated by underscores:
 
 <img width="560" alt="Screenshot 2025-04-08 at 00 15 49" src="https://github.com/user-attachments/assets/711c709f-4e94-48f8-b792-9406e4128fd5" />
 
-**First part - 2 letter code indicating the type of duty**
+**First part - 2 letter code indicating the type of duty**\
 The codes used for each duty can be seen in the image above. These codes may be changed as long as you are consistent across weeks and if you do change them completely the past duties column in the duty allocation databse must be updated.
 
-**Second part - day of the week**
+**Second part - day of the week**\
 1 means Monday, 2 means Tuesday and so on
 
-**Third part - duty requirements**
+**Third part - duty requirements**\
 Requirements of the duty - in [4 letter code format](#4-letter-codes). Each letter corresponds to a letter in the prefects' 4 letter data. A "*" indicates there is no requirement for that letter and can be anything. A letter indicates the duty requires a person with that particular letter in that slot. When there are multiple options, they may both be put in brackets.
 
 For example:
 **GN means:
-- It doesn't matter if the prefect is Singaporean
-- It doesn't matter if the prefect is Christian
-- The prefect must be a girl
-- The prefect must be a non-exco
+- It doesn't matter if prefect is Singaporean
+- It doesn't matter if prefect is Christian
+- Prefect must be a girl
+- Prefect must be a non-exco (and not subcomm exco)
+
+SC*(NS) means:
+- Prefect must be Singaporean
+- Prefect must be Christian
+- Gender doens't matter
+- Prefect must be either a non-exco or a subcomm exco (i.e. all non-excos)
 
 ## Linking the sheets and documents to the code
 

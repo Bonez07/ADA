@@ -37,6 +37,7 @@ ADA requires all the data of the prefects to be stored in a spreadsheet referred
 > Check with the House Captains of each house what roles there are in the house that are given duties differently. Some houses have no distinction between prefects and year reps, some do, some have more than 2 different roles (e.g. Oldham has dedicated Christian reps to do prayers). Include in the form all options that need to be taken into account when allocating duties.
 
 **2.** Rearrange the data on if they are Singaporean, Christian, their gender and their position into the following 4 letter code format:
+<a name="4-letter-codes"></a>
 - First letter: if they are Singaporean (S for Singaporean, N for non-Singaporean)
 - Second letter: if they are Christian (C for christian, N for non-Christian)
 - Third letter: their gender (B for boy, G for girl)
@@ -78,7 +79,7 @@ For example:\
 <img width="800" alt="Screenshot 2025-04-07 at 09 03 55" src="https://github.com/user-attachments/assets/17e596fa-e04d-418b-9488-3651d5663a19" />
 
 ## Setting up roster templates
-For ADA to know what duties to allocate, duties need to but put down on the roster template using a code in curly brackets for every duty:
+For ADA to know what duties to allocate, duties need to but put down on the roster template using a code in curly brackets for every duty. Every single duty that needs to be allocated needs to be written into the document in this manner.
 
 <img width="500" alt="Screenshot 2025-04-07 at 23 13 26" src="https://github.com/user-attachments/assets/36bd72b9-1325-4fbd-a79c-49dee38591b2" />
 
@@ -86,12 +87,21 @@ Duty codes are split into 3 parts separated by underscores:
 
 <img width="560" alt="Screenshot 2025-04-08 at 00 15 49" src="https://github.com/user-attachments/assets/711c709f-4e94-48f8-b792-9406e4128fd5" />
 
+**First part - 2 letter code indicating the type of duty**
+The codes used for each duty can be seen in the image above. These codes may be changed as long as you are consistent across weeks and if you do change them completely the past duties column in the duty allocation databse must be updated.
 
+**Second part - day of the week**
+1 means Monday, 2 means Tuesday and so on
 
+**Third part - duty requirements**
+Requirements of the duty - in [4 letter code format](#4-letter-codes). Each letter corresponds to a letter in the prefects' 4 letter data. A "*" indicates there is no requirement for that letter and can be anything. A letter indicates the duty requires a person with that particular letter in that slot. When there are multiple options, they may both be put in brackets.
 
-
-
-
+For example:
+**GN means:
+- It doesn't matter if the prefect is Singaporean
+- It doesn't matter if the prefect is Christian
+- The prefect must be a girl
+- The prefect must be a non-exco
 
 ## Linking the sheets and documents to the code
 

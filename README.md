@@ -3,24 +3,25 @@
 <p align="center">Automatic duty allocation and attendance sheet generation for school and house prefects at ACS International. Created and maintained by Bono Jakub Gajdek, Secretary/SHOH of the 20th Prefectorial Board.</p>
 
 # Overview
-
+<p align="center">
 <img width="600" alt="ADA overview" src="https://github.com/user-attachments/assets/bfe90b1a-9d8a-4c5d-99dd-98df3c848e48" />
+</p>
 
 **ADA works with 4 primary files when allocating duties:**
-- Duty roster template doc
-  - Document which contains all of the duties ADA needs to allocate (these are written in a special code explained later)
-  - These duties can be flexibly changed as necessary
-  - ADA copies this document to create the duty roster and replaces the duty codes with names it allocated
-- 2 attendance sheets for PB and House
-  - ADA extracts the total duty counts from these spreadsheets to be used in allocation
-  - ADA creates a new attendance sheet under these spreadsheets from a template
-  - It fills the newly created attendance sheet with checkboxes based on allocations and updates the total duty count
-- Duty allocation database sheet
+- [Duty allocation database sheet](#setting-up-the-allocation-database)
   -  Sheet containing names, data (if they are Singaporean, Christian, gender and position), past duties, days where prefect is unavailable
   -  This data is used in allocations of duties
   -  ADA updates the past duties column after allocating
+- [2 attendance sheets for PB and House](#setting-up-attendance-sheets)
+  - ADA extracts the total duty counts from these spreadsheets to be used in allocation
+  - ADA creates a new attendance sheet under these spreadsheets from a template
+  - It fills the newly created attendance sheet with checkboxes based on allocations and updates the total duty count
+- [Duty roster template doc](#setting-up-roster-templates)
+  - Document which contains all of the duties ADA needs to allocate (these are written in a special code explained later)
+  - These duties can be flexibly changed as necessary
+  - ADA copies this document to create the duty roster and replaces the duty codes with names it allocated
  
-Duty allocations take into account:
+**Duty allocations take into account:**
 - Requirements of the duty
 - Total number of duties
 - Number of duties that week

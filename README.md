@@ -3,19 +3,17 @@
 <p align="center">Automatic duty allocation and attendance sheet generation for school and house prefects at ACS International. Created and maintained by Bono Jakub Gajdek, Secretary/SHOH of the 20th Prefectorial Board.</p>
 
 # Overview
+ADA's functionality can be summarised in the following diagram:
 <p align="center">
 <img width="600" alt="ADA overview" src="https://github.com/user-attachments/assets/bfe90b1a-9d8a-4c5d-99dd-98df3c848e48" />
 </p>
 
 **ADA works with 4 primary files when allocating duties:**
 - [Duty allocation database sheet](#setting-up-the-allocation-database)
-  -  Sheet containing names, data (if they are Singaporean, Christian, gender and position), past duties, days where prefect is unavailable
-  -  This data is used in allocations of duties
-  -  ADA updates the past duties column after allocating
+  - Sheet containing names, data (if they are Singaporean, Christian, gender and position), past duties, days where prefect is unavailable
+  - This data is used when allocating duties
 - [2 attendance sheets for PB and House](#setting-up-attendance-sheets)
-  - ADA extracts the total duty counts from these spreadsheets to be used in allocation
-  - ADA creates a new attendance sheet under these spreadsheets from a template
-  - It fills the newly created attendance sheet with checkboxes based on allocations and updates the total duty count
+  - Duty attendance speadsheets in which ADA automatically creates attendance worksheets (Spreadsheet refers to the whole file, worksheet refers to the tab under the spreadsheet)
 - [Duty roster template doc](#setting-up-roster-templates)
   - Document which contains all of the duties ADA needs to allocate (these are written in a special code explained later)
   - These duties can be flexibly changed as necessary
@@ -78,7 +76,7 @@ For example:\
 
 
 ## Setting up attendance sheets
-2 attendace spreadsheets will be needed for ADA - one for school prefects and one for house prefects (or probation nominees). The attendance sheets will be generated when generating rosters from a template that needs to be set up.
+2 attendace spreadsheets will be needed for ADA - one for school prefects and one for house prefects (or probation nominees). The attendance worksheets will be generated when generating rosters from a template that needs to be set up.
 
 **1.** On the PB attendance Google Sheet, make a worksheet named "Template"
 
@@ -126,11 +124,32 @@ SC*(NS) means:
 - Gender doens't matter
 - Prefect must be either a non-exco or a subcomm exco (i.e. all non-excos)
 
+School prefect duties and house prefect duties are differentiated by colour. Duties coloured in black will be given to school prefects, duties coloured in red will be given to house prefects.
+
+### Paired duties
+Sometimes, there are pairs of duties where at least one singaporean/any other requirement is needed. For these cases, the required letter can be put in square brackets (e.g. [S]\*\*N and [S]\*\*(ES)) and the program will randomly select one of the duties to have that requirement while it will be replaced with a "*" for the rest. For duties to be paired, they must have square brackets on the same letter and must be on the same day. If there are multiple duty pairs on the same day with the same requirement, the requirement can be tagged with an underscore followed by any letter to differentiate the pairs and the letter after the underscore with be ignored (e.g. S**[P_a], \*C\*[P_a] and **G[P_b], ***[P_b] will be treated as 2 separate duty pairs where one from each pair will be randomly given P as the last letter)
+
+I recommend having multiple templates set-up - one for each house to meet their specific requirements.
+
 ## Linking the sheets and documents to the code
+You may have two separate sets of sheets: one set for testing and one actual set. Whether the actual or test set will be used can be toggled via the "mode" variable:
+
+<img width="339" alt="Screenshot 2025-04-09 at 22 19 10" src="https://github.com/user-attachments/assets/272c6b6d-7bfc-48be-87c8-1e24cb58e8f7" />
+
+The sheets and docs used can be linked by copying the ID into the code.
+
+A file's ID can be found in its link as follows:
+<img width="718" alt="Screenshot 2025-04-09 at 10 46 24" src="https://github.com/user-attachments/assets/d55b66a4-29d2-4807-8cf6-93c0a723fc3a" />
+
+And pasted in its corresponding variable in the code:
+<img width="919" alt="Screenshot 2025-04-09 at 10 47 24" src="https://github.com/user-attachments/assets/27a361a2-54ae-4f4d-b945-8031e18d102f" />
 
 # Usage instructions
+Once all the set-up is finished and a template as well as all the sheets are linked to the code, running the code is relatively straightforward
 
+<img width="1342" alt="Screenshot 2025-04-09 at 23 40 58" src="https://github.com/user-attachments/assets/e819ed63-b631-469b-b9ce-1bb96cbb6b5f" />
 
+After the code is run, the execution log should show up and inform you if the allocation was successful as well as any errors or warnings.
 
 # Developer instructions
 

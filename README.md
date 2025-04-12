@@ -76,7 +76,7 @@ For example:\
 
 
 ## Setting up attendance sheets
-2 attendace spreadsheets will be needed for ADA - one for school prefects and one for house prefects (or probation nominees). The attendance worksheets will be generated when generating rosters from a template that needs to be set up.
+2 attendace spreadsheets will be needed for ADA - one for school prefects and one for house prefects (or probation nominees). The attendance worksheets will be generated from a template when ADA is run.
 
 **1.** On the PB attendance Google Sheet, make a worksheet named "Template"
 
@@ -127,9 +127,14 @@ SC*(NS) means:
 School prefect duties and house prefect duties are differentiated by colour. Duties coloured in black will be given to school prefects, duties coloured in red will be given to house prefects.
 
 ### Paired duties
-Sometimes, there are pairs of duties where at least one singaporean/any other requirement is needed. For these cases, the required letter can be put in square brackets (e.g. [S]\*\*N and [S]\*\*(ES)) and the program will randomly select one of the duties to have that requirement while it will be replaced with a "*" for the rest. For duties to be paired, they must have square brackets on the same letter and must be on the same day. If there are multiple duty pairs on the same day with the same requirement, the requirement can be tagged with an underscore followed by any letter to differentiate the pairs and the letter after the underscore with be ignored (e.g. S**[P_a], \*C\*[P_a] and **G[P_b], ***[P_b] will be treated as 2 separate duty pairs where one from each pair will be randomly given P as the last letter)
+Sometimes, there are pairs of duties where at least one singaporean/any other requirement is needed. For these cases, the required letter can be put in square brackets (e.g. [S]\*\*N and [S]\*\*(ES)) and the program will randomly select one of the duties to have that requirement while it will be replaced with a "\*" for the rest. If you wish to replace with something other than a "\*", you may use a "/" to put another requirement which you wish to replace the rest of the duties with (e.g. S**[P/Y] and \*C\*[P/Y] means one prefect one year rep) For duties to be paired, they must have square brackets on the same letter and must be on the same day. If there are multiple duty pairs on the same day with the same requirement, the requirement can be tagged with an underscore followed by any letter to differentiate the pairs and the letter after the underscore with be ignored (e.g. S**[P_a], \*C\*[P_a] and **G[P_b], ***[P_b] will be treated as 2 separate duty pairs where one from each pair will be randomly given P as the last letter)
 
-I recommend having multiple templates set-up - one for each house to meet their specific requirements.
+I recommend having multiple templates set-up - one for each house to meet their specific requirements and making new templates whenever there are changes to duties on certain weeks.
+
+### Forcing duties
+Sometimes, you may want to manually allocate a prefect instead of letting ADA decide. To force someone to get a certain duty, simply put their preferred name (same one as in database) in brackets in place of the duty requirements. This will put the person on the duty and update the attendance sheet and database sheet.
+
+e.g. {{EX_1_(Bono)}} allocates a Monday EXCO duty to Bono
 
 ## Linking the sheets and documents to the code
 You may have two separate sets of sheets: one set for testing and one actual set. Whether the actual or test set will be used can be toggled via the "mode" variable:
@@ -144,6 +149,8 @@ A file's ID can be found in its link as follows:
 And pasted in its corresponding variable in the code:
 <img width="919" alt="Screenshot 2025-04-09 at 10 47 24" src="https://github.com/user-attachments/assets/27a361a2-54ae-4f4d-b945-8031e18d102f" />
 
+The rosterFolderID variable refers to a google drive folder where ADA will create a copy of the roster.
+
 # Usage instructions
 Once all the set-up is finished and a template as well as all the sheets are linked to the code, running the code is relatively straightforward
 
@@ -151,10 +158,17 @@ Once all the set-up is finished and a template as well as all the sheets are lin
 
 After the code is run, the execution log should show up and inform you if the allocation was successful as well as any errors or warnings.
 
+
+
+### Config options
+
 # Developer instructions
 
 # Other notes
 What to do when the subcommittee EXCOs are decided?
+
+How to set up probation duty weeks?
+
 
 
 

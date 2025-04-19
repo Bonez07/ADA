@@ -47,6 +47,7 @@ ADA requires all the data of the prefects to be stored in a spreadsheet referred
   - If they are Christian
   - Gender
   - Committee (for school prefects only)
+  - Year group (for house prefects only)
   - Whether they are a house prefect or a tutor/year rep (for house prefects only)
 > [!NOTE]
 > Check with the House Captains of each house what roles there are in the house that are given duties differently. Some houses have no distinction between prefects and year reps, some do, some have more than 2 different roles (e.g. Oldham has dedicated Christian reps to do prayers). Include in the form all options that need to be taken into account when allocating duties.
@@ -57,10 +58,12 @@ ADA requires all the data of the prefects to be stored in a spreadsheet referred
 - Second letter: if they are Christian (C for christian, N for non-Christian)
 - Third letter: their gender (B for boy, G for girl)
 - Fourth letter: their position (for school prefects: E for EXCO, S for Subcomm EXCO, H for House Captain, N for other positions) (for house prefects: P for house prefect, Y for year rep)
+- For House Captains only: after the 4 letter code add dash and the 3 letter house name
 
 For example:\
 ***SCBE*** means the prefect is Singaporean, Christian, a boy and an EXCO\
 ***NNGN*** means the prefect is non-Singaporean, non-Christian, a girl and a non-EXCO
+**SNGH-CKS*** means this is the House Captain of CKS and is Singaporean, non-Christian and a girl
 
 > [!TIP]
 > Use find and replace and the `=CONCATENATE()` function in Google Sheets to easily combine the raw responses to the 4 letter code format
@@ -74,6 +77,13 @@ For example:\
 
 <img width="667" alt="Screenshot 2025-04-07 at 22 18 13" src="https://github.com/user-attachments/assets/240c06b9-49df-4682-842e-5d353557ec95" />
 
+### Unavailable days
+
+If you know in advance certain prefects are unable to do duty on certain days (e.g. due to having something on Tuesday whitespace/committee having a major event on that day), you can tell ADA not to give those people duty by putting down the days under the "Unavailable days" column in the database. 1 corresponds to Monday, 2 to Tuesday and so on.
+
+For example if HBHG has peer leader meetings and can't do duty on Tuesday and Affairs has a major event and requested not to do duty on that week you may put:
+
+<img width="784" alt="Screenshot 2025-04-19 at 12 34 28" src="https://github.com/user-attachments/assets/ffa2a456-9186-4ab8-9ed2-33d06d94b82d" />
 
 ## Setting up attendance sheets
 2 attendace spreadsheets will be needed for ADA - one for school prefects and one for house prefects (or probation nominees). The attendance worksheets will be generated from a template when ADA is run.
@@ -109,7 +119,7 @@ The codes used for each duty can be seen in the image above. These codes may be 
 1 means Monday, 2 means Tuesday and so on
 
 **Third part - duty requirements**\
-Requirements of the duty - in [4 letter code format](#4-letter-codes). Each letter corresponds to a letter in the prefects' 4 letter data. A "*" indicates there is no requirement for that letter and can be anything. A letter indicates the duty requires a person with that particular letter in that slot. When there are multiple options for a certain letter, they should both be put in brackets.
+Requirements of the duty - in [4 letter code format](#4-letter-codes). Each letter corresponds to a letter in the prefects' 4 letter data. A "*" indicates there is no requirement for that letter and can be anything. A letter indicates the duty requires a person with that particular letter in that slot. When there are multiple options, they may both be put in brackets.
 
 For example:
 **GN means:
@@ -152,23 +162,55 @@ And pasted in its corresponding variable in the code:
 The rosterFolderID variable refers to a google drive folder where ADA will create a copy of the roster.
 
 # Usage instructions
-Once all the set-up is finished and a template as well as all the sheets are linked to the code, running the code is relatively straightforward
+Once all the set-up is finished and a template as well as all the sheets are linked to the code, running the code is relatively straightforward. Do make sure your attendance sheet and database are all up to date before you run the code.
 
 <img width="1342" alt="Screenshot 2025-04-09 at 23 40 58" src="https://github.com/user-attachments/assets/e819ed63-b631-469b-b9ce-1bb96cbb6b5f" />
 
 After the code is run, the execution log should show up and inform you if the allocation was successful as well as any errors or warnings.
 
+I recommend running the code in testing mode in the same conditions before making the real roster just to make sure there are no issues.
+
+## Config options
+ADA offers a number of settings when giving duties which allow fine tuning of the allocations:
+<img width="1084" alt="Screenshot 2025-04-19 at 15 04 25" src="https://github.com/user-attachments/assets/120a5249-b679-4c5c-afd6-027890e39b28" />
+
+Here is an explanation of each:
+
+**copyRosterTemplate** - when true: ADA will copy the roster template doc into the roster folder and fill in the names on the copy. when false: ADA will fill in the names directly on the roster template doc
+
+**schoolPrefectColor** - color of the school prefect names on the roster template (in CSS color format - in hex and in RGB) - this color will be used to pick out which duties are to be given to school prefects (default value is "#000000" which is black)
+
+**housePrefectColor** - color of the house prefect names on the roster template (in CSS color format - in hex and in RGB) - this color will be used to pick out which duties are to be given to house prefects (default value is "#ff0000" which is red)
+
+**subcommProbabilityScalingFactor** - a value between 0 and 1 dictating how likely subcomm excos are to get exco duties. 0 means they will get no exco duties, 1 means they will get the same amount of exco duties as regualar excos
+
+**yearRepScoreOffset** - a value determining how much less duties year reps (marked with last letter "Y") get compared to other house prefects. 0 means same amount, the more positive the less duties (I recommend not using values higher than 0.3). You may use a different value for this for each house - check with the House Captains whether they want year reps to get same number or less duties than prefects.
+
+For a more complete picture of what these settings do, refer to the [prefect scoring algorithm](#prefect-scoring-algorithm)
+
+**dutiesThisWeekWeightingPB** - a value between 0 and 1 dictating how much ADA will avoid giving a prefect multiple duties in the same week. 0 means ADA will not look at the number of duties this week and allocate based on total number of duties, 1 means ADA will not look at the total duties and only make sure no one gets multiple duties in the week
+
+**dutiesThisWeekWeightingHouse** - same as the previous value but for house prefects. I recommend making this higher than the previous since house prefects are less strict with making sure everyone has the same number of total duties and focus more on spreading out the duties across all prefects
+
+The following settings require a more technical understanding of the algorithm and I recommend not modifying the values unless you know what you're doing:
+
+**generalScoreWeighting** - a value between 0 and 1 dictating how much ADA will look at the number of total duties and duties this week compared to how well the specific duty matches. 0 means ADA will only consider the time since the last specific duty and number of specific duties, 1 means ADA will only consider the number of total duties and duties this week
+
+**timeSinceSpecificDutyWeighting** - a value between 0 and 1 dictating how much ADA will look at the time since the last specific duty compared to the number of specific duties
+
+**worseScoreWeighting** - a value between 0 and 1 dictating how much ADA will look at the worse of the general and specific scores comapred to the weighted average
 
 
-### Config options
 
-# Developer instructions
+
+# Technical details
+## Prefect scoring algorithm
+
+<img width="800" alt="Prefect Scoring Algorithm" src="https://github.com/user-attachments/assets/af23cd32-885e-4f5d-8e92-557cce3ecdf6" />
+
 
 # Other notes
 What to do when the subcommittee EXCOs are decided?
+How to handle duty replacements?
 
 How to set up probation duty weeks?
-
-
-
-

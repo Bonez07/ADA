@@ -119,7 +119,7 @@ The codes used for each duty can be seen in the image above. These codes may be 
 1 means Monday, 2 means Tuesday and so on
 
 **Third part - duty requirements**\
-Requirements of the duty - in [4 letter code format](#4-letter-codes). Each letter corresponds to a letter in the prefects' 4 letter data. A "*" indicates there is no requirement for that letter and can be anything. A letter indicates the duty requires a person with that particular letter in that slot. When there are multiple options, they may both be put in brackets.
+Requirements of the duty - in [4 letter code format](#4-letter-codes). Each letter corresponds to a letter in the prefects' 4 letter data. A "*" indicates there is no requirement for that letter and can be anything. A letter indicates the duty requires a person with that particular letter in that slot. When there are multiple options for a particular letter, the different options should both be put in brackets.
 
 For example:
 **GN means:

@@ -184,7 +184,7 @@ Here is an explanation of each:
 
 **subcommProbabilityScalingFactor** - a value between 0 and 1 dictating how likely subcomm excos are to get exco duties. 0 means they will get no exco duties, 1 means they will get the same amount of exco duties as regualar excos
 
-**yearRepScoreOffset** - a value determining how much less duties year reps (marked with last letter "Y") get compared to other house prefects. 0 means same amount, the more positive the less duties (I recommend not using values higher than 0.3). You may use a different value for this for each house - check with the House Captains whether they want year reps to get same number or less duties than prefects.
+**yearRepScoreOffset** - a value determining how much less duties year reps (marked with last letter "Y") get compared to other house prefects. 0 means same amount, the more positive the less duties (Around a value of 5 shoule be reasonable to make every prefect get 2 duties while year reps get 1 or 2). You may use a different value for this for each house - check with the House Captains whether they want year reps to get same number or less duties than prefects.
 
 For a more complete picture of what these settings do, refer to the [prefect scoring algorithm](#prefect-scoring-algorithm)
 

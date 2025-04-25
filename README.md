@@ -113,7 +113,20 @@ Duty codes are split into 3 parts separated by underscores:
 <img width="560" alt="Screenshot 2025-04-08 at 00 15 49" src="https://github.com/user-attachments/assets/711c709f-4e94-48f8-b792-9406e4128fd5" />
 
 **First part - 2 letter code indicating the type of duty**\
-The codes used for each duty can be seen in the image above. These codes may be changed as long as you are consistent across weeks and if you do change them completely the past duties column in the duty allocation databse must be updated.
+2 letter codes are used to represent the type of duty that is needed. These codes are for storing past duties in the duty allocation database as well as for the code's internal reference. Most of these codes may be changed but I recommend the following convention:
+
+| **Duty** | **Code** |
+| ------- | ------- |
+| EXCO on supervision | EX |
+| Foyer duty | FY |
+| Foyer Attire Escorts | FA |
+| PA System (PA, pledge, prayer) | PA |
+| Back Gate | BG |
+| Flag Raising | FL |
+| Assembly/Chapel Stage | MC |
+| Assembly/Chapel Escorts | ES |
+| Assembly/Chapel Doors | DO |
+| Chapel Attire Escorts | CA |
 
 **Second part - day of the week**\
 1 means Monday, 2 means Tuesday and so on

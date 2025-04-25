@@ -1,4 +1,4 @@
-//Config       
+//Config
 const mode = "real"; //"test" or "real"
 const termAndWeek = ""; //Write in format "T_W_"
 const houseOnDuty = ""; //House on duty (3 letters). For SLT weeks write "SLT", for probation duty weeks "Probation Nominees"
@@ -7,7 +7,7 @@ const houseOnDuty = ""; //House on duty (3 letters). For SLT weeks write "SLT", 
 const rosterTemplateID = ""; //Duty roster template
 //Real
 const realPBAttendanceSheetID = ""; //PB attendance sheet
-const realHouseAttendanceSheetID = ""; //House attendance sheet
+const realHouseAttendanceSheetID = ""; //House/nominees attendance sheet
 const realDatabaseSheetID = ""; //Duty allocation database sheet
 const realRosterFolderID = ""; //Folder where duty roster is created
 //Test
@@ -21,14 +21,14 @@ const schoolPrefectColor = "#000000"; //color of school prefect names on roster
 const housePrefectColor = "#ff0000"; //color of house prefect/nominee names on roster
 
 //Allocation settings (all between 0 and 1)
-const subcommProbabilityScalingFactor = 0.65; //how many exco/emcee duties subcomm excos get compared to regular excos (between 0 and 1)
-const yearRepScoreOffset = 0.1; //The higher this value, the less duties year reps will get compared to prefects
+const subcommProbabilityScalingFactor = 0.7; //how many exco/emcee duties subcomm excos get compared to regular excos (between 0 and 1)
+const yearRepScoreOffset = 5; //The higher this value, the less duties year reps will get compared to prefects
 
-const dutiesThisWeekWeightingPB = 0.2; //The higher this value, the more ADA will avoid giving prefects multiple duties in the same week
+const dutiesThisWeekWeightingPB = 0.6; //The higher this value, the more ADA will avoid giving prefects multiple duties in the same week
 const dutiesThisWeekWeightingHouse = 0.9; //Same as the previous value but for house prefects
-const generalScoreWeighting = 0.8; //The higher this value, the more duties will be given to those who have less total duties
+const generalScoreWeighting = 0.85; //The higher this value, the more duties will be given to those who have less total duties
 const timeSinceSpecificDutyWeighting = 0.6; //The higher this value, the higher the weighting of the time since specific duty compared to the number of specific duties
-const worseScoreWeighting = 0.3; //The higher this value, the more weighting will be on the worse of the general and specific score
+const worseScoreWeighting = 0.23; //The higher this value, the more weighting will be on the worse of the general and specific score
 
 //Database format (1-indexed) (col 1 = col A)
 const fullNameCol = 1;
@@ -95,53 +95,19 @@ function main() {
   }
   //Allocate Exco duties
   while (excoDuties.length > 0) {
-    //find duty with least elligible
-    let noElligible = excoDuties.map(duty => prefectorialBoard.findGoodElligible(duty).length + 0.1*prefectorialBoard.findElligible(duty).length);
-    let minimum = Math.min(...noElligible);
-    if (minimum == 0) {
-      //if no good elligible find regular elligible
-      noElligible = excoDuties.map(duty => prefectorialBoard.findElligible(duty).length);
-      minimum = Math.min(...noElligible);
-    }
-    //find index
-    let index = noElligible.indexOf(minimum);
+    let index = findNextDutyIndex(excoDuties, prefectorialBoard);
     prefectorialBoard.allocateDuty(excoDuties[index])
     excoDuties.splice(index, 1)
   }
   //Allocate PB duties
   while (pbDuties.length > 0) {
-    //find duty with least elligible
-    let noElligible = pbDuties.map(duty => prefectorialBoard.findGoodElligible(duty).length + 0.1*prefectorialBoard.findElligible(duty).length);
-    let minimum = Math.min(...noElligible);
-    if (minimum == 0) {
-      //if no good elligible find regular elligible
-      noElligible = pbDuties.map(duty => prefectorialBoard.findElligible(duty).length);
-      minimum = Math.min(...noElligible);
-    }
-    //find index
-    let index = noElligible.indexOf(minimum);
+    let index = findNextDutyIndex(pbDuties, prefectorialBoard);
     prefectorialBoard.allocateDuty(pbDuties[index])
     pbDuties.splice(index, 1)
   }
   //Allocate HP duties
   while (hpDuties.length > 0) {
-    //find duty with least elligible
-    let noElligible = hpDuties.map(duty => housePrefects.findGoodElligible(duty).length + 0.1*housePrefects.findElligible(duty).length);
-    let minimum = Math.min(...noElligible);
-    if (minimum == 0) {
-      //if no good elligible find regular elligible
-      console.warn("No good elligible: ", hpDuties[noElligible.indexOf(minimum)].raw);
-      noElligible = hpDuties.map(duty => housePrefects.findElligible(duty).length);
-      minimum = Math.min(...noElligible);
-    }
-    //find index
-    let index = noElligible.indexOf(minimum);
-    //give error if none elligible at all
-    if (minimum == 0) {
-      console.error("None elligible: ", hpDuties[index])
-      hpDuties.splice(index, 1);
-      continue;
-    }
+    let index = findNextDutyIndex(hpDuties, housePrefects);
     housePrefects.allocateDuty(hpDuties[index])
     hpDuties.splice(index, 1)
   }
@@ -452,6 +418,7 @@ function processDuties(rawDuties, pb) {
     const j = Math.floor(Math.random() * (i + 1));
     [duties[i], duties[j]] = [duties[j], duties[i]];
   }
+  duties.sort((a, b) => [2, 4].includes(a.day) - [2, 4].includes(b.day));
   duties.forEach(duty => {
     if (duty.prefects == "PB") {
       if (duty.id == "EX") {
@@ -474,6 +441,41 @@ function processDuties(rawDuties, pb) {
     }
   });
   return duties;
+}
+function findNextDutyIndex(duties, prefects) {
+    //find duty with least elligible
+    let noElligible = duties.map(duty => prefects.findGoodElligible(duty).length + 0.3*prefects.findElligible(duty).length);
+    let minimum = Math.min(...noElligible);
+    noElligible = duties.map(duty => {
+      value = prefects.findGoodElligible(duty).length + 0.3*prefects.findElligible(duty).length;
+      if (minimum > 3) {
+        if ([1, 3, 5].includes(duty.day)) {
+          value -= minimum/4;
+        }
+      }
+      if (minimum > 6) {
+        //for rare duties make them allocate first
+        if (duty.id == "FA") {
+          value -= minimum/4;
+        }
+        else if (duty.id == "DO" || duty.id == "CA" || duty.id == "MC") {
+          value -= minimum/6;
+        }
+        else if (duty.id == "PA" || duty.id == "BG") {
+          value -= minimum/9;
+        }
+      }
+      return value;
+      });
+    minimum = Math.min(...noElligible);
+    if (minimum <= 0) {
+      //if no good elligible find regular elligible
+      noElligible = duties.map(duty => prefects.findElligible(duty).length);
+      minimum = Math.min(...noElligible);
+    }
+    //find index
+    let index = noElligible.indexOf(minimum);
+    return index;
 }
 function standardize(value, list) {
   if (!Array.isArray(list) || list.length === 0) {
@@ -532,26 +534,26 @@ class Prefects {
     elligible = elligible.filter(prefect => !(prefect.adjacentDutyDays.includes(duty.day)));
     if (elligible.length == 0) {
       elligible = initialElligible;
-      console.warn(`No no adjacent matches for "${duty.raw}"`);
+      console.warn(`No non-adjacent day matches for "${duty.raw}" - prefect may get duty 2 days in a row`);
     }
     else {
       initialElligible = elligible;
     }
     if (duty.id != "EX") {
-      //check previous duty
-      elligible = elligible.filter(prefect => !(prefect.pastDuties.substring(prefect.pastDuties.length - 3).includes(duty.id)));
-      if (elligible.length == 0) {
-        elligible = initialElligible;
-        console.warn(`No other previous duty matches for "${duty.raw}"`);
-      }
-      else {
-        initialElligible = elligible;
-      }
       //prevent giving 3 duties in 1 week
       elligible = elligible.filter(prefect => prefect.dutiesThisWeek < 2);
       if (elligible.length == 0) {
         elligible = initialElligible;
-        console.warn(`No 2 duties matchess for "${duty.raw}"`);
+        console.warn(`No 2 duties in week matchess for "${duty.raw}" - prefect may get 3 duties in the week`);
+      }
+      else {
+        initialElligible = elligible;
+      }
+      //check previous duty
+      elligible = elligible.filter(prefect => !(prefect.pastDuties.substring(prefect.pastDuties.length - 3).includes(duty.id)));
+      if (elligible.length == 0) {
+        elligible = initialElligible;
+        console.warn(`No different previous duty matches for "${duty.raw}" - prefect may get the same type of duty twice in a row"`);
       }
     }
     //scoring remaining prefects
@@ -585,9 +587,6 @@ class Prefects {
       }
       else {
         prefect.generalScore = (1-dutiesThisWeekWeightingHouse)*(prefect.totalDuties - Math.min(...totalDuties)) + (dutiesThisWeekWeightingHouse)*(prefect.dutiesThisWeek);
-        if (prefect.data[3] == "Y") {
-          prefect.generalScore += yearRepScoreOffset;
-        }
         prefect.specificScore = timeSinceSpecificDutyWeighting*(-standardize(prefect.timeSinceSpecificDuty, timesSinceSpecificDuty)) + (1-timeSinceSpecificDutyWeighting)*(standardize(prefect.totalSpecificDuties, totalSpecificDuties));
       }
     });
@@ -601,10 +600,14 @@ class Prefects {
       }
       else {
         prefect.totalScore = (worseScoreWeighting)*Math.max(prefect.generalScore, prefect.specificScore) + (1-worseScoreWeighting)*((generalScoreWeighting)*prefect.generalScore + (1-generalScoreWeighting)*prefect.specificScore);
-      }   
+      } 
+      if (prefect.data[3] == "Y") {
+        prefect.totalScore += yearRepScoreOffset;
+      }  
+      //add bias for non-singaporeans non-christians so that SC can be saved for duties that require them
+      prefect.totalScore += (Number(prefect.data[0] == "S") + Number(prefect.data[1] == "C"))/8;
     });
     let finalOptions = elligible.filter(prefect => Math.min(...elligible.map(person => person.totalScore)) == prefect.totalScore);
-    finalOptions = finalOptions.filter(prefect => Math.min(...finalOptions.map(person => Number(person.data[0] == "S") + Number(person.data[1] == "C"))) == (Number(prefect.data[0] == "S") + Number(prefect.data[1] == "C")));
     //randomly select from lowest scores
     let prefect = finalOptions[Math.floor(Math.random() * finalOptions.length)];
     //increment duties

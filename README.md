@@ -118,7 +118,7 @@ Duty codes are split into 3 parts separated by underscores:
 | **Duty** | **Code** |
 | ------- | ------- |
 | EXCO on supervision | EX |
-| Foyer duty | FY |
+| Foyer Duty | FY |
 | Foyer Attire Escorts | FA |
 | PA System (PA, pledge, prayer) | PA |
 | Back Gate | BG |
@@ -197,24 +197,19 @@ Here is an explanation of each:
 
 **subcommProbabilityScalingFactor** - a value between 0 and 1 dictating how likely subcomm excos are to get exco duties. 0 means they will get no exco duties, 1 means they will get the same amount of exco duties as regualar excos
 
-**yearRepScoreOffset** - a value determining how much less duties year reps (marked with last letter "Y") get compared to other house prefects. 0 means same amount, the more positive the less duties (Around a value of 5 shoule be reasonable to make every prefect get 2 duties while year reps get 1 or 2). You may use a different value for this for each house - check with the House Captains whether they want year reps to get same number or less duties than prefects.
-
-For a more complete picture of what these settings do, refer to the [prefect scoring algorithm](#prefect-scoring-algorithm)
+**yearRepScoreOffset** - a value determining how much less duties year reps (marked with last letter "Y") get compared to other house prefects. 0 means same amount, the more positive the less duties (value of ~5 to make every prefect get 2 duties while year reps get 1 or 2, ~2.1 to make all year reps get 1 duty while prefects get 1 or 2). You may use a different value for this for each house - check with the House Captains whether they want year reps to get same number or less duties than prefects.
 
 **dutiesThisWeekWeightingPB** - a value between 0 and 1 dictating how much ADA will avoid giving a prefect multiple duties in the same week. 0 means ADA will not look at the number of duties this week and allocate based on total number of duties, 1 means ADA will not look at the total duties and only make sure no one gets multiple duties in the week
 
 **dutiesThisWeekWeightingHouse** - same as the previous value but for house prefects. I recommend making this higher than the previous since house prefects are less strict with making sure everyone has the same number of total duties and focus more on spreading out the duties across all prefects
 
-The following settings require a more technical understanding of the algorithm and I recommend not modifying the values unless you know what you're doing:
+The following settings require a more technical understanding of the algorithm and I recommend not modifying the values unless you know what you're doing. For a more complete picture of what these settings do, refer to the [prefect scoring algorithm](#prefect-scoring-algorithm)
 
 **generalScoreWeighting** - a value between 0 and 1 dictating how much ADA will look at the number of total duties and duties this week compared to how well the specific duty matches. 0 means ADA will only consider the time since the last specific duty and number of specific duties, 1 means ADA will only consider the number of total duties and duties this week
 
 **timeSinceSpecificDutyWeighting** - a value between 0 and 1 dictating how much ADA will look at the time since the last specific duty compared to the number of specific duties
 
 **worseScoreWeighting** - a value between 0 and 1 dictating how much ADA will look at the worse of the general and specific scores comapred to the weighted average
-
-
-
 
 # Technical details
 ## Prefect scoring algorithm

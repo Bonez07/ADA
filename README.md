@@ -213,14 +213,21 @@ The following settings require a more technical understanding of the algorithm a
 **worseScoreWeighting** - a value between 0 and 1 dictating how much ADA will look at the worse of the general and specific scores comapred to the weighted average
 
 # Technical details
-# TO BE UPDATED SOON
+TO BE UPDATED SOON
 ## Prefect scoring algorithm
+To decide which prefect gets a duty the following algorithm is followed:
+1. Filter out prefects who:
+  - Meet the duty requirements
+  - Have no duties on the adjacent days
+  - Have a different previous duty
+  - Have no more than 1 duty on that week
+2. Give each prefect a score for how suitable they are for the duty - the prefect of the lowest score is chosen. The algorithm goes as follows:
 
 <img width="800" alt="Prefect Scoring Algorithm" src="https://github.com/user-attachments/assets/af23cd32-885e-4f5d-8e92-557cce3ecdf6" />
-
+x
 
 # Other notes
-# TO BE UPDATED SOON
+TO BE UPDATED SOON
 What to do when the subcommittee EXCOs are decided?
 How to handle duty replacements?
 How to set up probation duty weeks?

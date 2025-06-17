@@ -3,7 +3,7 @@
 <p align="center">Automatic duty allocation and attendance sheet generation for school and house prefects at ACS International. Created and maintained by Bono Jakub Gajdek, Secretary/SHOH of the 20th Prefectorial Board.</p>
 
 # Video guide
-[![Video guide](https://img.youtube.com/vi/AvcMz5czzPs/0.jpg)](https://youtu.be/AvcMz5czzPs)
+[![Video guide](https://img.youtube.com/vi/AvcMz5czzPs/maxresdefault.jpg)](https://youtu.be/AvcMz5czzPs)
 
 # Overview
 ADA's functionality can be summarised in the following diagram:
